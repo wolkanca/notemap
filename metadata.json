@@ -1,0 +1,6 @@
+{
+  "name": "World Mosaic",
+  "description": "Interactive world map and personal country note-taking mosaic workspace with continent filtering, custom palette, and live search.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
