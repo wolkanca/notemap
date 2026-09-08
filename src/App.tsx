@@ -34,22 +34,18 @@ export default function App() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const t = translations[language];
 
-  // Export Map handler (SVG snapshot download)
   const handleExportMap = () => {
     if (!svgRef.current) return;
     try {
       const svgElement = svgRef.current;
       const serializer = new XMLSerializer();
       let source = serializer.serializeToString(svgElement);
-
-      // Add name spaces
-      if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+      if (!source.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
         source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
       }
-      if (!source.match(/^<svg[^>]+xmlns:xlink="http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+      if (!source.match(/^<svg[^>]+xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/)) {
         source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
       }
-
       const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(svgBlob);
       const a = document.createElement('a');
@@ -66,7 +62,6 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#F8F9FA] text-slate-800 overflow-hidden font-sans select-none">
-      {/* Top Navigation Bar */}
       <Navbar
         language={language}
         onLanguageChange={changeLanguage}
@@ -79,7 +74,6 @@ export default function App() {
         stats={stats}
       />
 
-      {/* Continent Navigation Filter */}
       <ContinentFilter
         selectedContinent={selectedContinent}
         onSelectContinent={(cId) => setSelectedContinent(cId)}
@@ -87,10 +81,9 @@ export default function App() {
         continentCounts={stats.continentCounts}
       />
 
-      {/* Main Workspace Area (Map + Side Panel) */}
-      <div className="flex-1 flex flex-col lg:flex-row relative overflow-hidden">
-        {/* World Map Interactive Viewport */}
-        <main className="flex-1 relative h-[60vh] lg:h-auto overflow-hidden">
+      {/* Desktop: map + sidebar side-by-side. Mobile: map first, panel below with page scrolling. */}
+      <div className="flex-1 flex flex-col lg:flex-row relative min-h-0 overflow-y-auto lg:overflow-hidden">
+        <main className="flex-none lg:flex-1 relative h-[52vh] min-h-[360px] lg:h-auto lg:min-h-0 overflow-hidden">
           <WorldMap
             countryStates={countryStates}
             selectedCountryId={selectedCountryId}
@@ -99,35 +92,30 @@ export default function App() {
             language={language}
             svgRefProp={svgRef}
           />
-
-          {/* Color Legend overlay */}
           <ColorLegend countryStates={countryStates} language={language} />
         </main>
 
-        {/* Selected Country Details & Notes Sidebar */}
-        <CountryPanel
-          country={selectedCountry}
-          userState={selectedState}
-          onClose={() => setSelectedCountryId(null)}
-          onSetColor={setCountryColor}
-          onSetNote={setCountryNote}
-          onSetStatus={setCountryStatus}
-          onClear={clearCountry}
-          saveStatus={saveStatus}
-          language={language}
-        />
+        <div className="flex-none lg:flex lg:h-full lg:min-h-0">
+          <CountryPanel
+            country={selectedCountry}
+            userState={selectedState}
+            onClose={() => setSelectedCountryId(null)}
+            onSetColor={setCountryColor}
+            onSetNote={setCountryNote}
+            onSetStatus={setCountryStatus}
+            onClear={clearCountry}
+            saveStatus={saveStatus}
+            language={language}
+          />
+        </div>
       </div>
 
-      {/* Statistics & Backup Modal */}
       <StatsModal
         isOpen={isStatsOpen}
         onClose={() => setIsStatsOpen(false)}
         language={language}
         countryStates={countryStates}
-        onStatesImported={() => {
-          // Trigger refresh of stats
-          window.location.reload();
-        }}
+        onStatesImported={() => window.location.reload()}
         stats={stats}
       />
     </div>
